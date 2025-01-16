@@ -33,40 +33,22 @@ class FalafelStall:
 
     def serve_dish(self, order_id, dish):
         if order_id not in self.orders.keys():
-             raise NoSuchOrderException
+            raise NoSuchOrderException
         if not isinstance(order_id, int):
             raise TypeError
-        # if order_id not in self.orders.keys():
-        #     raise NoSuchOrderException
+        
         try:
             order_dish = self.orders[order_id][1]
-            # customer, order_dish = self.orders[order_id]
-            if order_dish == dish:
-                for ingredient in dish.get_ingredients():
-                    if ingredient in self.get_ingredient_prices().keys():
-                        self.money += self.calculate_cost(dish)
-                self.remove_order(order_id)
-            else:
-                raise NotCustomerDishException(order_dish,dish)
+            
+            if order_dish != dish:
+                raise NotCustomerDishException(order_dish, dish)
+            
+            # Proceed with serving the dish
+            if all(ingredient in self.get_ingredient_prices().keys() for ingredient in dish.get_ingredients()):
+                self.money += self.calculate_cost(dish)
+                self.remove_order(order_id)  # Remove the order after serving
         except NotCustomerDishException as e:
             print(f"Failed to serve a Dish to customer\n{e}")
-
-            # self.money += self.calculate_cost(dish)
-        # del self.orders[order_id]
-        # return True
-        # if not isinstance(order_id, int):
-        #     raise TypeError
-        # if order_id not in self.orders.keys():
-        #     raise NoSuchOrderException
-        # for order_ids in self.orders.items():
-        #     if order_ids[1] == dish:
-        #         ingredients_str = split(order_ids[1])
-        #         for ingredient in self.get_ingredient_prices().keys():
-        #             for ing in ingredients_str:
-        # #                 if ing == ingredient:
-        # #                     self.money += self.calculate_cost(dish)
-        # self.remove_order(order_id)
-        # return True
 
     def remove_order(self, order_id):
         if order_id not in self.orders:
