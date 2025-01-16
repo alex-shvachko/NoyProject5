@@ -4,13 +4,18 @@ from exceptions import NoSuchIngredientException, NoSuchOrderException, OrderOut
 
 class LeastPatienceCustomerServingStrategy(ServingStrategy):
     def select_next_order(self, orders):
+        least_p = None
         if not orders:
-            return None
-        min_patience = float('inf')
-        selected_order = None
-        for order_id, (customer, dish) in orders.items():
-            patience = customer.get_patience()
-            if patience < min_patience or (patience == min_patience and order_id < (selected_order or float('inf'))):
-                min_patience = patience
-                selected_order = order_id
-        return selected_order
+            raise OrderOutOfBoundsException
+
+        if not orders:
+            raise OrderOutOfBoundsException
+        least_p = None
+        for order_id in orders:
+            customer, dish = orders[order_id]
+            if least_p is None or customer.get_patience() < orders[least_p][0].get_patience():
+                least_p = order_id
+        return least_p
+
+        # least_p = sorted(orders.items(), key=lambda item: (item[1][0].get_patience(), item[0]))
+        # return least_p[0]

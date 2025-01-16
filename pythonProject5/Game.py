@@ -4,7 +4,6 @@ from FalafelStall import FalafelStall
 from exceptions import NoSuchIngredientException, NoSuchOrderException, OrderOutOfBoundsException, NotCustomerDishException
 from Customer import Customer
 from LeastPatienceCustomerServingStrategy import LeastPatienceCustomerServingStrategy
-
 class Game:
     def __init__(self, orders_strategy, serving_strategy, ingredient_prices):
         self.__orders_strategy = orders_strategy
@@ -48,20 +47,16 @@ class Game:
 
     def update_mood_customer(self, falafel_stall):
         removed_orders = []
-        for order_id, (customer, _) in falafel_stall.get_orders().items():
-            customer.update()  # Let the customer handle their own time update
-            if customer.get_patience() <= 0:
+        for order_id in falafel_stall.get_orders().keys():
+            falafel_stall.get_orders()[order_id][0].update(falafel_stall.get_orders()[order_id][0].get_waiting_time())
+            if falafel_stall.get_orders()[order_id][0].get_patience <= 0:
                 removed_orders.append(order_id)
-                self.lives = self.lives - 1
+                self.lives = self.lives-1
             if self.lives <= 0:
-                for del_orders in removed_orders:
-                    falafel_stall.remove_order(del_orders)
-                print("Game Over")
-                print(f"score: {falafel_stall.get_earning():.1f}")
-                return True
+                print(f"Game Over\nscore: {falafel_stall.get_earning()}")
+                return -1
         for del_orders in removed_orders:
             falafel_stall.remove_order(del_orders)
-        return False
 
     def create_orders(self, falafel_stall):
         orders = next(self.__orders_strategy)
@@ -74,60 +69,56 @@ class Game:
         return order_ids
 
     def orders_by_strategy(self, falafel_stall):
-        orders = falafel_stall.get_orders()
-        if not orders:
-            return
-        order_id = self.__serving_strategy.select_next_order(orders)
-        if order_id is not None:
-            customer, dish = orders[order_id]
-            output = []
-            output.append("Customer:")
-            output.append("**********************")
-            output.append(f"* name: {customer.get_name():<12} *")
-            output.append(f"* mood: {str(customer.get_mood()):<12} *")
-            output.append(f"* personality: {str(customer.get_personality()):<5} *")
-            output.append(f"* patience: {customer.get_patience():<8} *")
-            output.append("**********************")
-            output.append(f"Dish: {str(dish)}")
-            print("\n".join(output))
+        orders = falafel_stall.get_orders
+        sorted_orders = self.__serving_strategy(orders)
+        for order_id, (customer, ordered_dish) in sorted_orders:
+            print(f"Customer:\n{customer}\nDish: {ordered_dish}")
 
     def run(self):
         falafel_stall = FalafelStall(self.__serving_strategy, self.__ingredient_prices)
         while True:
-            try:
-                orders = next(self.__orders_strategy)
-            except StopIteration:
-                break
-            
+            orders = next(self.__orders_strategy)
             if orders:
                 for customer, ordered_dish in orders:
                     falafel_stall.order(customer, ordered_dish)
-            
-            while falafel_stall.get_orders():
-                self.orders_by_strategy(falafel_stall)
-                if self.update_mood_customer(falafel_stall):
-                    return
-                
-                print("Insert ingredients:")
-                for index, ingredient in self.__ingredient_dictionary.items():
-                    print(f"{index}: {ingredient}")
-                
-                user_num = input()
-                try:
-                    new_dish = self.create_dish(user_num)
-                    order_id = self.__serving_strategy.select_next_order(falafel_stall.get_orders())
-                    if order_id is not None:
-                        try:
-                            falafel_stall.serve_dish(order_id, new_dish)
-                        except NotCustomerDishException as e:
-                            print(f"Failed to serve a Dish to customer\nError:\n{e}")
-                except NoSuchIngredientException as e:
-                    print(f"Failed to create a Dish\n{e}\nplease retry.")
-                except (NoSuchOrderException, OrderOutOfBoundsException) as e:
-                    print(f"Failed to serve a Dish to customer\n{e}")
-                
-                if self.update_mood_customer(falafel_stall):
-                    return
-        
-        print("Game Over")
-        print(f"score: {falafel_stall.get_earning():.1f}")
+            self.orders_by_strategy(falafel_stall)
+            for order_id, (customer, ordered_dish) in falafel_stall.get_orders().items():
+            #     #order_id = falafel_stall.order(customer, ordered_dish)
+                 print(f"Customer:\n{customer}\nDish: {ordered_dish}")
+            # #curr_id = self.__serving_strategy.
+
+
+            print("Insert ingredients:")
+            for index, ingredient in self.__ingredient_dictionary.items():
+                print(f"{index}: {ingredient}")
+
+
+            user_num = input()
+            try:
+                new_dish = self.create_dish(user_num)
+                falafel_stall.serve_dish(order_id, new_dish)
+            except NoSuchIngredientException as e:
+                print(f"Failed to create a Dish\n{e}\nplease retry.")
+            except (NoSuchOrderException, OrderOutOfBoundsException, NotCustomerDishException) as e:
+                print(f"Failed to serve a Dish to customer\n{e}")
+                #continue
+
+                    #continue
+            # except StopIteration:
+            #      break
+            finish = self.update_mood_customer(falafel_stall)
+            if finish == -1:
+                break
+        print(f"Game Over\nscore: {falafel_stall.get_earning()}")
+        # for order_id, (customer, _) in list(falafel_stall.get_orders().items()):
+            #     customer.get_mood(-1)
+            #     if customer.get_mood() <= 0:
+            #         falafel_stall.remove_order(order_id)
+
+
+        #             self.lives -= 1
+        #     if not falafel_stall.get_orders():
+        #         break
+        # print(f"Game Over\nscore: {falafel_stall.get_earning()}")
+
+
