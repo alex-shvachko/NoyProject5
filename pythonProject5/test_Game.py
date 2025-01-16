@@ -222,19 +222,5 @@ class TestGameSimulation(TestGame):
                     game.run()
 
         option1 = self.has_calls(mock_print, expected_calls1, any_order=True)
-        if not option1:
-            for call_item in mock_print.mock_calls:
-                if call_item not in expected_calls1:
-                    print(f"Unexpected call: {call_item}")
-            for call_item in expected_calls1:
-                if call_item not in mock_print.mock_calls:
-                    print(f"Missing expected call (option1): {call_item}")
         option2 = self.has_calls(mock_print, expected_calls2, any_order=True)
-        if not option2:
-            for call_item in mock_print.mock_calls:
-                if call_item not in expected_calls2:
-                    print(f"Unexpected call: {call_item}")
-            for call_item in expected_calls2:
-                if call_item not in mock_print.mock_calls:
-                    print(f"Missing expected call (option2): {call_item}")
         self.assertTrue(option1 or option2)

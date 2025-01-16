@@ -7,20 +7,17 @@ from Explosive import Explosive
 
 class TypeB(Personality):
     def adjust_mood(self, mood, waiting_time):
-        if isinstance(mood, Furious) and waiting_time > 120:
+        if waiting_time > 120 and mood == Furious():
             return Explosive()
-        elif isinstance(mood, Angry) and waiting_time > 90:
+        elif waiting_time > 90 and mood == Angry():
             return Furious()
-        elif isinstance(mood, Calm) and waiting_time > 60:
+        elif waiting_time > 60 and mood == Calm():
             return Angry()
-        elif isinstance(mood, Chill) and waiting_time > 40:
+        elif waiting_time > 40 and mood == Chill():
             return Calm()
         return mood
 
     def __repr__(self):
         return "TypeB"
 
-    def __eq__(self, other):
-        if not isinstance(other, TypeB):
-            return False
-        return True
+

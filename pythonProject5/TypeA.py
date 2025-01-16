@@ -15,10 +15,7 @@ class TypeA(Personality):
     def __repr__(self):
         return "TypeA"
 
-    def __eq__(self, other):
-        if not isinstance(other, TypeA):
-            return False
-        return True
+
 
 
 

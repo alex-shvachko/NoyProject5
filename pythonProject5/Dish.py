@@ -1,3 +1,4 @@
+
 class Dish:
     def __init__(self, ingredients=None):
         self.__ingredients = ingredients if ingredients else []
@@ -11,7 +12,7 @@ class Dish:
     def __eq__(self, other):
         if not isinstance(other, Dish):
             return False
-        return len(self.get_ingredients()) == len(other.get_ingredients()) and all(ingredient in other.get_ingredients() for ingredient in self.get_ingredients())
+        return sorted(self.get_ingredients()) == sorted(other.get_ingredients())
 
     def __repr__(self):
-        return "* " + ", ".join(self.__ingredients) + " *"
+        return "* " +", ".join(self.__ingredients) + " *"
