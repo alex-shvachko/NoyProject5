@@ -10,10 +10,14 @@ class Furious(Angry):
         return self.__strength
 
     def get_patience_factor(self, waiting_time):
-        new_factor =super().get_patience_factor(waiting_time)* 2
+        new_factor = round(super().get_patience_factor(waiting_time) * 1.5, 2)
         return new_factor
+
+    def __eq__(self, other):
+        if not isinstance(other, Furious):
+            return False
+        return self.get_strength() == other.get_strength()
 
     def __repr__(self):
         return "Furious"
-
 
